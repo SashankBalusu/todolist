@@ -111,7 +111,8 @@ function createTask(todoList){
     for (let i = 0; i <todoList.length; i++){
         
         const div = document.createElement("div")
-        div.id = "todoTask"
+        div.classList.add("todoTask")
+        div.id = "task" + i;
         container.appendChild(div)
         let item = todoList[i]
         console.log(localList)
@@ -127,6 +128,21 @@ function createTask(todoList){
         const priority = document.createElement("p")
         priority.textContent = item.priorities
         div.appendChild(priority)
+
+
+        const xOut = document.createElement("button")
+        xOut.textContent = "x"
+        xOut.setAttribute("style", "background:transparent; border:none;")
+        xOut.id = "close"  + i
+        xOut.classList.add("xOut")
+        xOut.addEventListener("click", function(){
+            let xOutID = xOut.getAttribute("id").slice(5)
+            let div = document.querySelector("#task" + xOutID)
+            div.remove()
+            localList.splice(xOutID, 1)
+            localStorage.setItem("todoList", JSON.stringify(todoList))
+        })
+        div.appendChild(xOut)
     }
 
     body.setAttribute("style","grid-template-rows: repeat("+ todoList.length+", 100px); display:grid;")
@@ -141,7 +157,8 @@ function createSpecificTask(name){
         if (localList[i].projects == name){
             counter++
             const div = document.createElement("div")
-            div.id = "todoTask"
+            div.classList.add("todoTask")
+            div.id = "task" + i
             container.appendChild(div)
             let item = localList[i]
             const title = document.createElement("p")
@@ -156,6 +173,20 @@ function createSpecificTask(name){
             const priority = document.createElement("p")
             priority.textContent = item.priorities
             div.appendChild(priority)
+
+            const xOut = document.createElement("button")
+            xOut.textContent = "x"
+            xOut.setAttribute("style", "background:transparent; border:none;")
+            xOut.id = "close"  + i
+            xOut.classList.add("xOut")
+            xOut.addEventListener("click", function(){
+                let xOutID = xOut.getAttribute("id").slice(5)
+                let div = document.querySelector("#task" + xOutID)
+                div.remove()
+                localList.splice(xOutID, 1)
+                localStorage.setItem("todoList", JSON.stringify(localList))
+            })
+            div.appendChild(xOut)
         }
     }
     body.setAttribute("style","grid-template-rows: repeat("+ counter+", 100px); display:grid;")
@@ -216,7 +247,7 @@ function createScreen(){
         allTasks.setAttribute("style", "border-right: solid #66FCF1")
         projectButtonEventListener(allTasks.textContent)
     })
-    allTasks.setAttribute("style", "background: transparent; border: none;")
+    allTasks.setAttribute("style", "background: transparent; border: none; border-right:solid #66FCF1")
     projectButtons.appendChild(allTasks)
 }
 
@@ -243,7 +274,7 @@ function createProjects(projects){
             elem.style.borderRight = "none"
         });
         let projectID = project.getAttribute("id").slice(7)
-        this.setAttribute("style", "border-right: solid #66FCF1; margin-top: " + Math.abs(projectID *60 + 60) + "px")
+        this.setAttribute("style", "border-right: solid #66FCF1; margin-top: " + Math.abs((projects.indexOf(project.textContent) +1) *60 + 60) + "px")
         projectButtonEventListener(project.textContent)
     })
     
@@ -253,9 +284,9 @@ function createProjectsFromStorageDOM (projects){
         let div = document.querySelector("#projectButtons")
         let project = document.createElement("button")
         project.classList.add("probut")
-        project.id = "project" + projects.length
+        project.id = "project" + i
         project.textContent = projects[i]
-        project.setAttribute("style", "background: transparent; border: none;margin-top: " + Math.abs(projects.length *60+ 60) + "px")
+        project.setAttribute("style", "background: transparent; border: none;margin-top: " + Math.abs((i+1) *60+ 60) + "px")
         
         //project.setAttribute("style", "margin-top: " + Math.abs(projects.length *60+ 60) + "px")
         div.appendChild(project)
@@ -271,8 +302,7 @@ function createProjectsFromStorageDOM (projects){
             x.forEach(function(elem) {
                 elem.style.borderRight = "none"
             });
-            let projectID = project.getAttribute("id").slice(7)
-            this.setAttribute("style", "border-right: solid #66FCF1; margin-top: " + Math.abs(projectID *60 + 60) + "px")
+            this.setAttribute("style", "border-right: solid #66FCF1; margin-top: " + Math.abs((i+1) *60 + 60) + "px")
             projectButtonEventListener(project.textContent)
         })
         

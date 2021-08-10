@@ -5,7 +5,16 @@ const continueToApp = document.querySelector("#continue")
 continueToApp.addEventListener("click", function(){
     continueToApp.setAttribute("style", "display:none;")
     createScreen()
-    createScreenFromLocalStorage()
+    let arr = createScreenFromLocalStorage()
+    let todoList = []
+    let projects = []
+    if (arr[0] != null) {
+        todoList = arr[0]
+    }
+    if (arr[1] != null) {
+        projects = arr[1]
+    }
+    
     const addtask = document.querySelector("#addtask")
     const addProject = document.querySelector("#addProject")
     let titleValue
@@ -13,8 +22,7 @@ continueToApp.addEventListener("click", function(){
     let dueValue
     let priorityValue
     let projectValue
-    let todoList = []
-    let projects = []
+    
     let numForms = 0
     addtask.addEventListener("mouseover", function(){
         addtask.setAttribute("style", "width: 200px")
@@ -53,7 +61,7 @@ continueToApp.addEventListener("click", function(){
         
 
     })
-
+    
     addProject.addEventListener("click", function(){
         if (!(numForms)){
             numForms++
@@ -88,6 +96,14 @@ continueToApp.addEventListener("click", function(){
             localStorage.setItem("todoList", JSON.stringify(todoList))
             createTask(todoList)
             numForms--
+            const xOut = document.querySelectorAll(".xOut")
+            xOut.forEach(function(elem){
+                elem.addEventListener("click", function(){
+                    let xOutID = elem.getAttribute("id").slice(5)
+                    todoList.splice(xOutID, 1)
+                    localStorage.setItem("todoList", JSON.stringify(todoList))
+                })
+            })
             // content.setAttribute("style", "opacity:100%;z-index:1")
             // projectsdiv.setAttribute("style", "opacity:100%; z-index:1;")
 
@@ -117,5 +133,14 @@ function createScreenFromLocalStorage(){
     let createTasksFromStorage = JSON.parse(localStorage.getItem("todoList"));
     if (createTasksFromStorage != null){
         createTask(createTasksFromStorage)
+        const xOut = document.querySelectorAll(".xOut")
+        xOut.forEach(function(elem){
+            elem.addEventListener("click", function(){
+                let xOutID = elem.getAttribute("id").slice(5)
+                createTasksFromStorage.splice(xOutID, 1)
+                localStorage.setItem("todoList", JSON.stringify(createTasksFromStorage))
+            })
+        })
     }
+    return [createTasksFromStorage, createProjectsFromStorage]
 }
