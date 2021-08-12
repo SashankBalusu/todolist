@@ -1,3 +1,5 @@
+import todoitem from "./objcreate.js"
+
 const content = document.querySelector("#content")
 const body = document.querySelector("body")
 let localList = []
@@ -38,12 +40,25 @@ function createForm (){
     due.id = "due"
     //due.setAttribute("required", "");
     form.appendChild(due)
-    const priority = document.createElement("input")
-    priority.type = "number"
-    priority.placeholder = "Priority"
+    const priority = document.createElement("select")
+    //priority.type = "number"
+    //priority.placeholder = "Priority"
     priority.id = "priority"
+    
     //priority.setAttribute("required", "");
     form.appendChild(priority)
+    const selectOption = document.createElement("option")
+    selectOption.textContent = "--Select a priority--"
+    priority.appendChild(selectOption)
+    const low = document.createElement("option")
+    low.textContent = "Low"
+    priority.appendChild(low)
+    const med = document.createElement("option")
+    med.textContent = "Medium"
+    priority.appendChild(med)
+    const high = document.createElement("option")
+    high.textContent = "High"
+    priority.appendChild(high)
     const project = document.createElement("input")
     project.type = "text"
     if (projectValue){
@@ -102,6 +117,104 @@ function deleteProjectForm(){
             child = e.lastElementChild;
         }
 }
+function createFormToEditTask (divID, titVal, desVal, dueVal, priVal){
+    if (document.querySelector("#formContainer") == null){
+        // const formContainer = document.querySelector("#formContainer")
+        // formContainer.setAttribute("style", "display:block;")
+        let formContainer = document.createElement("div")
+        formContainer.id = "formContainer"
+        body.appendChild(formContainer)
+        
+    }
+    else {
+        const form = document.querySelector("form")
+        
+    }
+    
+    const form = document.createElement("form")
+    //form.setAttribute("style", "z-index:2")
+    if (localList.length > 0){
+        form.setAttribute("style", "top:0;")
+    }
+    formContainer.appendChild(form)
+    const closeForm = document.createElement("button")
+    closeForm.textContent = "Cancel"
+    form.appendChild(closeForm)
+    closeForm.addEventListener("click", deleteForm)
+    const title = document.createElement("input")
+    title.type = "text"
+    title.value = titVal
+    title.id = "title"
+    //title.setAttribute("required", "");
+    form.appendChild(title)
+    const description = document.createElement("input")
+    description.type = "text"
+    description.value = desVal
+    description.id = "description"
+    form.appendChild(description) 
+    const due = document.createElement("input")
+    due.type = "date"
+    due.id = "due"
+    due.value = dueVal
+    //due.setAttribute("required", "");
+    form.appendChild(due)
+    const priority = document.createElement("select")
+    //priority.type = "number"
+    //priority.placeholder = "Priority"
+    priority.id = "priority"
+    
+    //priority.setAttribute("required", "");
+    form.appendChild(priority)
+    const selectOption = document.createElement("option")
+    selectOption.textContent = "--Select a priority--"
+    priority.appendChild(selectOption)
+    const low = document.createElement("option")
+    low.textContent = "Low"
+    priority.appendChild(low)
+    const med = document.createElement("option")
+    med.textContent = "Medium"
+    priority.appendChild(med)
+    const high = document.createElement("option")
+    high.textContent = "High"
+    priority.appendChild(high)
+    const project = document.createElement("input")
+    project.type = "text"
+    if (projectValue){
+        project.value = projectValue
+    }
+    else {
+        project.placeholder = "Project Name"
+    }
+    project.id = "project"
+    //project.setAttribute("required", "");
+    form.appendChild(project)
+    const submit = document.createElement("input")
+    submit.type = "submit"
+    submit.value = "submit"
+    submit.id = "submitEdit"
+    form.appendChild(submit)
+    submit.addEventListener("click", function() {
+        let titleValue = title.value
+        let descriptionValue = description.value
+        let dueValue = due.value
+        let priorityValue = priority.value
+        let projectValue = project.value
+        const date = new Date().getFullYear()
+        if (Number(dueValue.slice(0,4))< Number(date) ){
+            due.setCustomValidity("Invalid field.");
+        }
+        else {
+            deleteForm()
+            localList[divID] = (todoitem(titleValue, descriptionValue, dueValue, priorityValue, projectValue))
+            localStorage.setItem("todoList", JSON.stringify(localList))
+            createTask(localList)
+        }
+        //Cant change project rn, to add back simply check if project exists rn
+         
+    })
+    
+
+}
 function createTask(todoList){
     localList = todoList
     deleteTasks()
@@ -126,9 +239,24 @@ function createTask(todoList){
         due.textContent = item.dueDates
         div.appendChild(due)
         const priority = document.createElement("p")
-        priority.textContent = item.priorities
+        if (item.priorities != "--Select a priority--"){
+            priority.textContent = item.priorities
+            console.log(priority.textContent)
+        }
+        else {
+            priority.textContent = ""
+        }
         div.appendChild(priority)
-
+        
+        if (item.priorities == "Low"){
+            div.setAttribute("style", "background:green;")
+        }
+        else if (item.priorities == "Medium"){
+            div.setAttribute("style", "background:orange;")
+        }
+        else if (item.priorities == "High"){
+            div.setAttribute("style", "background:red;")
+        }
 
         const xOut = document.createElement("button")
         xOut.textContent = "x"
@@ -141,6 +269,9 @@ function createTask(todoList){
             div.remove()
             localList.splice(xOutID, 1)
             localStorage.setItem("todoList", JSON.stringify(todoList))
+        })
+        div.addEventListener("click", function(){
+            createFormToEditTask(i, title.textContent, des.textContent, due.textContent, priority.textContent)
         })
         div.appendChild(xOut)
     }
@@ -171,9 +302,23 @@ function createSpecificTask(name){
             due.textContent = item.dueDates
             div.appendChild(due)
             const priority = document.createElement("p")
-            priority.textContent = item.priorities
+            if (item.priorities != "--Select a priority--"){
+                priority.textContent = item.priorities
+                console.log(priority.textContent)
+            }
+            else {
+                priority.textContent = ""
+            }
             div.appendChild(priority)
-
+            if (item.priorities == "Low"){
+                div.setAttribute("style", "background:green;")
+            }
+            else if (item.priorities == "Medium"){
+                div.setAttribute("style", "background:orange;")
+            }
+            else if (item.priorities == "High"){
+                div.setAttribute("style", "background:red;")
+            }
             const xOut = document.createElement("button")
             xOut.textContent = "x"
             xOut.setAttribute("style", "background:transparent; border:none;")
@@ -185,6 +330,9 @@ function createSpecificTask(name){
                 div.remove()
                 localList.splice(xOutID, 1)
                 localStorage.setItem("todoList", JSON.stringify(localList))
+            })
+            div.addEventListener("click", function(){
+                createFormToEditTask(i, title.textContent, des.textContent, due.textContent, priority.textContent)
             })
             div.appendChild(xOut)
         }
@@ -282,6 +430,7 @@ function createProjects(projects){
 function createProjectsFromStorageDOM (projects){
     for (let i = 0; i < projects.length; i++){
         let div = document.querySelector("#projectButtons")
+       
         let project = document.createElement("button")
         project.classList.add("probut")
         project.id = "project" + i

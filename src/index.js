@@ -91,19 +91,27 @@ continueToApp.addEventListener("click", function(){
                 localStorage.setItem("projects", JSON.stringify(projects))
                 createProjects(projects)
             }
-            deleteForm()
-            todoList.push(todoitem(titleValue, descriptionValue, dueValue, priorityValue, projectValue))
-            localStorage.setItem("todoList", JSON.stringify(todoList))
-            createTask(todoList)
-            numForms--
-            const xOut = document.querySelectorAll(".xOut")
-            xOut.forEach(function(elem){
-                elem.addEventListener("click", function(){
-                    let xOutID = elem.getAttribute("id").slice(5)
-                    todoList.splice(xOutID, 1)
-                    localStorage.setItem("todoList", JSON.stringify(todoList))
+            const date = new Date().getFullYear()
+            if (Number(dueValue.slice(0,4))< Number(date) ){
+                due.setCustomValidity("Invalid field.");
+            }
+            else {
+                deleteForm()
+                todoList.push(todoitem(titleValue, descriptionValue, dueValue, priorityValue, projectValue))
+                localStorage.setItem("todoList", JSON.stringify(todoList))
+                createTask(todoList)
+                numForms--
+                const xOut = document.querySelectorAll(".xOut")
+                xOut.forEach(function(elem){
+                    elem.addEventListener("click", function(){
+                        let xOutID = elem.getAttribute("id").slice(5)
+                        todoList.splice(xOutID, 1)
+                        localStorage.setItem("todoList", JSON.stringify(todoList))
+                    })
                 })
-            })
+            }
+            
+            
             // content.setAttribute("style", "opacity:100%;z-index:1")
             // projectsdiv.setAttribute("style", "opacity:100%; z-index:1;")
 
@@ -127,7 +135,7 @@ function createScreenFromLocalStorage(){
     if (createProjectsFromStorage != null){
         let projLength = createProjectsFromStorage.length
         for (let i = 0; i < projLength; i++){
-            createProjectsFromStorageDOM(createProjectsFromStorage)
+            createProjectsFromStorageDOM(createProjectsFromStorage, "true")
         }
     }
     let createTasksFromStorage = JSON.parse(localStorage.getItem("todoList"));
